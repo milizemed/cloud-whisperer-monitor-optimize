@@ -81,7 +81,7 @@ const StoragePage = () => {
               <span>Usage: {resource.used} GB / {resource.capacity} GB</span>
               <span className="font-medium">{usagePercentage}%</span>
             </div>
-            <Progress value={usagePercentage} className="h-2" indicatorClassName={usageColorClass} />
+            <Progress value={usagePercentage} indicatorClassName={usageColorClass} />
             
             <div className="grid grid-cols-2 gap-2 mt-4">
               <div className="flex items-center">

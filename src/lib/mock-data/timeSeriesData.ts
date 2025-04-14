@@ -1,5 +1,5 @@
 
-import { TimeSeriesDataPoint } from '../types';
+import { TimeSeriesDataPoint } from '@/lib/types';
 
 // Generate timestamps for the past 24 hours, every hour
 const generateTimepoints = (hours: number = 24, interval: number = 1) => {
@@ -54,15 +54,15 @@ export const generateTimeSeriesData = (
   });
   
   return timePoints.map((time, index) => {
-    const dataPoint: TimeSeriesDataPoint = { time };
+    const dataPoint: Record<string, any> = { time };
     metrics.forEach(metric => {
       dataPoint[metric] = values[metric][index];
     });
-    return dataPoint;
+    return dataPoint as TimeSeriesDataPoint;
   });
 };
 
 // Resource usage data for line charts
-export const resourceUsageData: TimeSeriesDataPoint[] = generateTimeSeriesData(24, ['awsCpu', 'azureCpu']);
+export const resourceUsageData: TimeSeriesDataPoint[] = generateTimeSeriesData(24, ['awsCpu', 'azureCpu', 'gcpCpu']);
 export const networkUsageData: TimeSeriesDataPoint[] = generateTimeSeriesData(24, ['ingress', 'egress']);
-export const storageUsageData: TimeSeriesDataPoint[] = generateTimeSeriesData(24, ['s3', 'ebs', 'azureBlob'], 'up');
+export const storageUsageData: TimeSeriesDataPoint[] = generateTimeSeriesData(24, ['s3', 'ebs', 'azureBlob', 'gcpStorage'], 'up');

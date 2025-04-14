@@ -1,7 +1,6 @@
 
-import { CloudService } from '../types';
+import { CloudService } from '@/lib/types';
 
-// Cloud service status data
 export const cloudServices: CloudService[] = [
   {
     title: 'EC2 Compute',
@@ -46,24 +45,24 @@ export const cloudServices: CloudService[] = [
     lastUpdated: '3 minutes ago'
   },
   {
-    title: 'GKE',
+    title: 'GCP Compute Engine',
     provider: 'gcp',
     status: 'healthy',
-    description: 'Google Kubernetes Engine',
+    description: 'Google Compute Engine',
     lastUpdated: '7 minutes ago'
   },
   {
-    title: 'Cloud Storage',
+    title: 'GCP Cloud Storage',
     provider: 'gcp',
     status: 'healthy',
     description: 'Google Cloud Storage',
-    lastUpdated: '12 minutes ago'
+    lastUpdated: '9 minutes ago'
   },
   {
-    title: 'Cloud SQL',
+    title: 'GCP Cloud SQL',
     provider: 'gcp',
     status: 'warning',
-    description: 'Google Cloud SQL',
-    lastUpdated: '9 minutes ago'
+    description: 'Managed SQL Database',
+    lastUpdated: '4 minutes ago'
   }
 ];
