@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RefreshCw, Server, Clock, Cpu, HardDrive } from 'lucide-react';
+import { RefreshCw, Server, Clock, Cpu, HardDrive, Wifi, Database } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { computeInstances } from '@/lib/mock-data';
 
 const ComputePage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -24,6 +25,66 @@ const ComputePage = () => {
       setIsLoading(false);
       toast.success('Compute data refreshed');
     }, 1500);
+  };
+
+  // Filter instances by provider
+  const awsInstances = computeInstances.filter(instance => instance.provider === 'aws');
+  const azureInstances = computeInstances.filter(instance => instance.provider === 'azure');
+  const gcpInstances = computeInstances.filter(instance => instance.provider === 'gcp');
+
+  const renderComputeInstance = (instance: typeof computeInstances[0]) => {
+    // Set icon color based on provider
+    const iconColorClass = 
+      instance.provider === 'aws' ? 'text-aws' :
+      instance.provider === 'azure' ? 'text-azure' : 'text-gcp';
+
+    // Status color based on instance status
+    const statusColorClass = 
+      instance.status === 'healthy' ? 'bg-green-500' :
+      instance.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500';
+
+    return (
+      <Card key={instance.id} className="hover:shadow-md transition-shadow">
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-lg font-medium flex items-center">
+              <Server className={`h-5 w-5 mr-2 ${iconColorClass}`} />
+              {instance.name}
+            </CardTitle>
+            <div className="flex items-center">
+              <div className={`h-2.5 w-2.5 rounded-full ${statusColorClass} mr-2`}></div>
+              <span className="text-xs text-muted-foreground capitalize">{instance.status}</span>
+            </div>
+          </div>
+          <CardDescription>{instance.instanceType} - {instance.region}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex items-center">
+              <Cpu className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span className="text-sm">CPU: {instance.metrics.cpu}%</span>
+            </div>
+            <div className="flex items-center">
+              <HardDrive className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span className="text-sm">RAM: {instance.metrics.memory}%</span>
+            </div>
+            <div className="flex items-center">
+              <Database className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span className="text-sm">Disk: {instance.metrics.disk}%</span>
+            </div>
+            <div className="flex items-center">
+              <Wifi className="h-4 w-4 mr-2 text-muted-foreground" />
+              <span className="text-sm">Network: {instance.metrics.network}%</span>
+            </div>
+          </div>
+          {instance.publicIp && (
+            <div className="mt-2 text-xs text-muted-foreground">
+              Public IP: {instance.publicIp} | Private IP: {instance.privateIp}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
@@ -56,80 +117,37 @@ const ComputePage = () => {
             </Button>
           </div>
           
-          <Tabs defaultValue="instances" className="mb-6">
+          <Tabs defaultValue="all" className="mb-6">
             <TabsList>
-              <TabsTrigger value="instances">Instances</TabsTrigger>
+              <TabsTrigger value="all">All Instances</TabsTrigger>
+              <TabsTrigger value="aws">AWS</TabsTrigger>
+              <TabsTrigger value="azure">Azure</TabsTrigger>
+              <TabsTrigger value="gcp">GCP</TabsTrigger>
               <TabsTrigger value="containers">Containers</TabsTrigger>
               <TabsTrigger value="serverless">Serverless</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="instances" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium flex items-center">
-                      <Server className="h-5 w-5 mr-2 text-aws" />
-                      EC2 Instance i-123456
-                    </CardTitle>
-                    <CardDescription>t3.large - us-west-2</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex items-center">
-                        <Cpu className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span className="text-sm">CPU: 35%</span>
-                      </div>
-                      <div className="flex items-center">
-                        <HardDrive className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span className="text-sm">RAM: 2.4 GB</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium flex items-center">
-                      <Server className="h-5 w-5 mr-2 text-aws" />
-                      EC2 Instance i-789012
-                    </CardTitle>
-                    <CardDescription>m5.xlarge - us-east-1</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex items-center">
-                        <Cpu className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span className="text-sm">CPU: 22%</span>
-                      </div>
-                      <div className="flex items-center">
-                        <HardDrive className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span className="text-sm">RAM: 4.8 GB</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium flex items-center">
-                      <Server className="h-5 w-5 mr-2 text-azure" />
-                      Azure VM vm-345678
-                    </CardTitle>
-                    <CardDescription>Standard_D2s_v3 - eastus</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-2 gap-2">
-                      <div className="flex items-center">
-                        <Cpu className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span className="text-sm">CPU: 18%</span>
-                      </div>
-                      <div className="flex items-center">
-                        <HardDrive className="h-4 w-4 mr-2 text-muted-foreground" />
-                        <span className="text-sm">RAM: 3.2 GB</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+            <TabsContent value="all" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {computeInstances.map(renderComputeInstance)}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="aws" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {awsInstances.map(renderComputeInstance)}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="azure" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {azureInstances.map(renderComputeInstance)}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="gcp" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {gcpInstances.map(renderComputeInstance)}
               </div>
             </TabsContent>
             
@@ -151,7 +169,7 @@ const ComputePage = () => {
                   <Server className="h-10 w-10 text-primary mx-auto mb-4" />
                   <h3 className="text-xl font-medium mb-2">Serverless Functions</h3>
                   <p className="text-muted-foreground">
-                    Manage AWS Lambda and Azure Functions.
+                    Manage AWS Lambda, Azure Functions, and Cloud Functions.
                   </p>
                 </div>
               </div>

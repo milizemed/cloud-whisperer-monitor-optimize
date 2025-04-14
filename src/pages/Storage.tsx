@@ -3,10 +3,11 @@ import React, { useState } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RefreshCw, Database, Clock, HardDrive, BarChart3 } from 'lucide-react';
+import { RefreshCw, HardDrive, Clock, Database, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
+import { storageResources } from '@/lib/mock-data';
 
 const StoragePage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -25,6 +26,77 @@ const StoragePage = () => {
       setIsLoading(false);
       toast.success('Storage data refreshed');
     }, 1500);
+  };
+
+  // Filter storage resources by provider
+  const awsStorage = storageResources.filter(resource => resource.provider === 'aws');
+  const azureStorage = storageResources.filter(resource => resource.provider === 'azure');
+  const gcpStorage = storageResources.filter(resource => resource.provider === 'gcp');
+  
+  // Filter by type
+  const objectStorage = storageResources.filter(resource => resource.storageType === 'object');
+  const blockStorage = storageResources.filter(resource => resource.storageType === 'block');
+  const fileStorage = storageResources.filter(resource => resource.storageType === 'file');
+
+  const renderStorageResource = (resource: typeof storageResources[0]) => {
+    // Set icon color based on provider
+    const iconColorClass = 
+      resource.provider === 'aws' ? 'text-aws' :
+      resource.provider === 'azure' ? 'text-azure' : 'text-gcp';
+
+    // Status color based on resource status
+    const statusColorClass = 
+      resource.status === 'healthy' ? 'bg-green-500' :
+      resource.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500';
+
+    // Calculate usage percentage
+    const usagePercentage = Math.round((resource.used / resource.capacity) * 100);
+    
+    // Get color for usage bar
+    const usageColorClass = 
+      usagePercentage > 85 ? 'bg-red-500' :
+      usagePercentage > 70 ? 'bg-yellow-500' : 'bg-green-500';
+
+    return (
+      <Card key={resource.id} className="hover:shadow-md transition-shadow">
+        <CardHeader className="pb-2">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-lg font-medium flex items-center">
+              <HardDrive className={`h-5 w-5 mr-2 ${iconColorClass}`} />
+              {resource.name}
+            </CardTitle>
+            <div className="flex items-center">
+              <div className={`h-2.5 w-2.5 rounded-full ${statusColorClass} mr-2`}></div>
+              <span className="text-xs text-muted-foreground capitalize">{resource.status}</span>
+            </div>
+          </div>
+          <CardDescription className="capitalize">
+            {resource.type} - {resource.region}
+            {resource.accessTier && ` - ${resource.accessTier}`}
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span>Usage: {resource.used} GB / {resource.capacity} GB</span>
+              <span className="font-medium">{usagePercentage}%</span>
+            </div>
+            <Progress value={usagePercentage} className="h-2" indicatorClassName={usageColorClass} />
+            
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <div className="flex items-center">
+                <Database className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-sm">Disk I/O: {resource.metrics.disk}%</span>
+              </div>
+              <div className="flex items-center">
+                <ArrowUpDown className="h-4 w-4 mr-2 text-muted-foreground" />
+                <span className="text-sm">Network: {resource.metrics.network}%</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
   };
 
   return (
@@ -57,156 +129,56 @@ const StoragePage = () => {
             </Button>
           </div>
           
-          <Tabs defaultValue="object" className="mb-6">
+          <Tabs defaultValue="all" className="mb-6">
             <TabsList>
+              <TabsTrigger value="all">All Storage</TabsTrigger>
               <TabsTrigger value="object">Object Storage</TabsTrigger>
               <TabsTrigger value="block">Block Storage</TabsTrigger>
-              <TabsTrigger value="database">Databases</TabsTrigger>
+              <TabsTrigger value="file">File Storage</TabsTrigger>
+              <TabsTrigger value="aws">AWS</TabsTrigger>
+              <TabsTrigger value="azure">Azure</TabsTrigger>
+              <TabsTrigger value="gcp">GCP</TabsTrigger>
             </TabsList>
             
+            <TabsContent value="all" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {storageResources.map(renderStorageResource)}
+              </div>
+            </TabsContent>
+            
             <TabsContent value="object" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-aws">
-                      <Database className="h-5 w-5 mr-2" />
-                      S3 Buckets
-                    </CardTitle>
-                    <CardDescription>AWS S3 Storage Usage</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">production-assets</span>
-                          <span className="text-sm text-muted-foreground">1.2 TB / 5 TB</span>
-                        </div>
-                        <Progress value={24} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">user-uploads</span>
-                          <span className="text-sm text-muted-foreground">3.8 TB / 5 TB</span>
-                        </div>
-                        <Progress value={76} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">backup-data</span>
-                          <span className="text-sm text-muted-foreground">4.2 TB / 5 TB</span>
-                        </div>
-                        <Progress value={84} className="h-2" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-azure">
-                      <Database className="h-5 w-5 mr-2" />
-                      Azure Blob Storage
-                    </CardTitle>
-                    <CardDescription>Azure Storage Usage</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">app-storage</span>
-                          <span className="text-sm text-muted-foreground">0.8 TB / 2 TB</span>
-                        </div>
-                        <Progress value={40} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">media-content</span>
-                          <span className="text-sm text-muted-foreground">1.5 TB / 2 TB</span>
-                        </div>
-                        <Progress value={75} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">analytics-data</span>
-                          <span className="text-sm text-muted-foreground">0.3 TB / 1 TB</span>
-                        </div>
-                        <Progress value={30} className="h-2" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {objectStorage.map(renderStorageResource)}
               </div>
             </TabsContent>
             
             <TabsContent value="block" className="mt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-aws">
-                      <HardDrive className="h-5 w-5 mr-2" />
-                      EBS Volumes
-                    </CardTitle>
-                    <CardDescription>AWS Block Storage</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">vol-12345 (gp3)</span>
-                          <span className="text-sm text-muted-foreground">80 GB / 100 GB</span>
-                        </div>
-                        <Progress value={80} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">vol-67890 (io1)</span>
-                          <span className="text-sm text-muted-foreground">120 GB / 200 GB</span>
-                        </div>
-                        <Progress value={60} className="h-2" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center text-azure">
-                      <HardDrive className="h-5 w-5 mr-2" />
-                      Azure Disks
-                    </CardTitle>
-                    <CardDescription>Azure Block Storage</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">disk-abcde (Premium SSD)</span>
-                          <span className="text-sm text-muted-foreground">90 GB / 128 GB</span>
-                        </div>
-                        <Progress value={70} className="h-2" />
-                      </div>
-                      <div>
-                        <div className="flex justify-between mb-1">
-                          <span className="text-sm font-medium">disk-fghij (Standard SSD)</span>
-                          <span className="text-sm text-muted-foreground">45 GB / 64 GB</span>
-                        </div>
-                        <Progress value={70} className="h-2" />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {blockStorage.map(renderStorageResource)}
               </div>
             </TabsContent>
             
-            <TabsContent value="database" className="mt-6">
-              <div className="rounded-lg border p-8 h-[300px] flex items-center justify-center">
-                <div className="text-center">
-                  <BarChart3 className="h-10 w-10 text-primary mx-auto mb-4" />
-                  <h3 className="text-xl font-medium mb-2">Database Management</h3>
-                  <p className="text-muted-foreground">
-                    Monitor and manage your cloud databases.
-                  </p>
-                </div>
+            <TabsContent value="file" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {fileStorage.map(renderStorageResource)}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="aws" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {awsStorage.map(renderStorageResource)}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="azure" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {azureStorage.map(renderStorageResource)}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="gcp" className="mt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {gcpStorage.map(renderStorageResource)}
               </div>
             </TabsContent>
           </Tabs>
