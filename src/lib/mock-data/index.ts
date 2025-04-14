@@ -5,6 +5,8 @@ import { resourceUsageData, networkUsageData, storageUsageData, generateTimeSeri
 import { alertsData, generateAlerts } from './alerts';
 import { computeInstances } from './computeResources';
 import { storageResources } from './storageResources';
+import { networkResources } from './networkResources';
+import { securityResources } from './securityResources';
 
 export {
   metrics,
@@ -16,5 +18,7 @@ export {
   alertsData,
   generateAlerts,
   computeInstances,
-  storageResources
+  storageResources,
+  networkResources,
+  securityResources
 };

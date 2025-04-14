@@ -7,6 +7,9 @@ import { RefreshCw, Shield, ShieldCheck, ShieldAlert, Clock, Lock } from 'lucide
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Separator } from '@/components/ui/separator';
+import { securityResources } from '@/lib/mock-data';
+import SecurityResourcesGrid from '@/components/dashboard/SecurityResourcesGrid';
 
 const SecurityPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -26,6 +29,18 @@ const SecurityPage = () => {
       toast.success('Security data refreshed');
     }, 1500);
   };
+
+  const handleRemediate = (id: string) => {
+    toast.success(`Remediation started for issue ${id}`);
+  };
+
+  // Calculate security score based on findings
+  const totalFindings = securityResources.reduce((sum, resource) => sum + resource.findings, 0);
+  const criticalFindings = securityResources.reduce((sum, resource) => sum + resource.criticalFindings, 0);
+  const securityScore = Math.round(100 - (criticalFindings * 5) - (totalFindings - criticalFindings));
+
+  // Get resources with issues
+  const resourcesWithIssues = securityResources.filter(r => r.findings > 0);
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -67,8 +82,10 @@ const SecurityPage = () => {
                 <CardDescription>Overall security assessment</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-status-healthy">85%</div>
-                <p className="text-sm text-muted-foreground mt-1">Good security posture</p>
+                <div className="text-3xl font-bold text-status-healthy">{securityScore}%</div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {securityScore >= 90 ? 'Excellent' : securityScore >= 80 ? 'Good' : securityScore >= 70 ? 'Fair' : 'Poor'} security posture
+                </p>
               </CardContent>
             </Card>
             
@@ -81,8 +98,10 @@ const SecurityPage = () => {
                 <CardDescription>Unresolved security issues</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-status-warning">12</div>
-                <p className="text-sm text-muted-foreground mt-1">3 high, 5 medium, 4 low</p>
+                <div className="text-3xl font-bold text-status-warning">{totalFindings}</div>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {criticalFindings} critical, {totalFindings - criticalFindings} other
+                </p>
               </CardContent>
             </Card>
             
@@ -109,73 +128,10 @@ const SecurityPage = () => {
             </TabsList>
             
             <TabsContent value="issues" className="mt-6">
-              <div className="space-y-4">
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <CardTitle className="text-lg font-medium">Unencrypted S3 Bucket</CardTitle>
-                      <Badge className="bg-status-critical text-white">High</Badge>
-                    </div>
-                    <CardDescription>AWS S3 bucket without encryption enabled</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm">
-                      The S3 bucket 'user-data-backup' does not have server-side encryption enabled. 
-                      This poses a risk to sensitive data stored in the bucket.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" size="sm" className="ml-auto">
-                      <Shield className="h-4 w-4 mr-2" />
-                      Remediate
-                    </Button>
-                  </CardFooter>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <CardTitle className="text-lg font-medium">Public Security Group</CardTitle>
-                      <Badge className="bg-status-critical text-white">High</Badge>
-                    </div>
-                    <CardDescription>AWS security group with unrestricted access</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm">
-                      Security group 'sg-12345' allows unrestricted access (0.0.0.0/0) to port 22 (SSH). 
-                      This poses a significant security risk.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" size="sm" className="ml-auto">
-                      <Shield className="h-4 w-4 mr-2" />
-                      Remediate
-                    </Button>
-                  </CardFooter>
-                </Card>
-                
-                <Card>
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-between">
-                      <CardTitle className="text-lg font-medium">Azure NSG Open Ports</CardTitle>
-                      <Badge className="bg-status-warning text-white">Medium</Badge>
-                    </div>
-                    <CardDescription>Network Security Group with open ports</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm">
-                      Azure NSG 'app-nsg' has port 3389 (RDP) open to a wide CIDR range. 
-                      Consider restricting access to specific IPs.
-                    </p>
-                  </CardContent>
-                  <CardFooter>
-                    <Button variant="outline" size="sm" className="ml-auto">
-                      <Shield className="h-4 w-4 mr-2" />
-                      Remediate
-                    </Button>
-                  </CardFooter>
-                </Card>
-              </div>
+              <SecurityResourcesGrid 
+                resources={resourcesWithIssues}
+                onRemediate={handleRemediate}
+              />
             </TabsContent>
             
             <TabsContent value="compliance" className="mt-6">

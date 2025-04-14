@@ -7,6 +7,8 @@ import { RefreshCw, Globe, Clock, Network, Wifi } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { networkResources } from '@/lib/mock-data';
+import NetworkResourcesGrid from '@/components/dashboard/NetworkResourcesGrid';
 
 const NetworkPage = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -26,6 +28,15 @@ const NetworkPage = () => {
       toast.success('Network data refreshed');
     }, 1500);
   };
+
+  // Filter resources by type
+  const vpcsAndVnets = networkResources.filter(
+    r => r.type === 'vpc' || r.type === 'vnet'
+  );
+  
+  const loadBalancers = networkResources.filter(
+    r => r.type === 'loadbalancer'
+  );
 
   return (
     <div className="flex h-screen overflow-hidden">
@@ -65,130 +76,11 @@ const NetworkPage = () => {
             </TabsList>
             
             <TabsContent value="vpcs" className="mt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Network className="h-5 w-5 mr-2 text-aws" />
-                      AWS VPCs
-                    </CardTitle>
-                    <CardDescription>Virtual Private Clouds</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">Production VPC</p>
-                          <p className="text-sm text-muted-foreground">CIDR: 10.0.0.0/16</p>
-                        </div>
-                        <Badge className="bg-status-healthy text-white">Active</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">Staging VPC</p>
-                          <p className="text-sm text-muted-foreground">CIDR: 10.1.0.0/16</p>
-                        </div>
-                        <Badge className="bg-status-healthy text-white">Active</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">Development VPC</p>
-                          <p className="text-sm text-muted-foreground">CIDR: 10.2.0.0/16</p>
-                        </div>
-                        <Badge className="bg-status-healthy text-white">Active</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Network className="h-5 w-5 mr-2 text-azure" />
-                      Azure VNets
-                    </CardTitle>
-                    <CardDescription>Virtual Networks</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">Production VNet</p>
-                          <p className="text-sm text-muted-foreground">CIDR: 172.16.0.0/16</p>
-                        </div>
-                        <Badge className="bg-status-healthy text-white">Active</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">Integration VNet</p>
-                          <p className="text-sm text-muted-foreground">CIDR: 172.17.0.0/16</p>
-                        </div>
-                        <Badge className="bg-status-warning text-white">Maintenance</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <NetworkResourcesGrid resources={vpcsAndVnets} />
             </TabsContent>
             
             <TabsContent value="load-balancers" className="mt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Wifi className="h-5 w-5 mr-2 text-aws" />
-                      AWS Load Balancers
-                    </CardTitle>
-                    <CardDescription>Application & Network Load Balancers</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">App-LB-1</p>
-                          <p className="text-sm text-muted-foreground">Application LB</p>
-                        </div>
-                        <Badge className="bg-status-healthy text-white">Healthy</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">Net-LB-1</p>
-                          <p className="text-sm text-muted-foreground">Network LB</p>
-                        </div>
-                        <Badge className="bg-status-healthy text-white">Healthy</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Wifi className="h-5 w-5 mr-2 text-azure" />
-                      Azure Load Balancers
-                    </CardTitle>
-                    <CardDescription>Load Balancing Services</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">Frontend-LB</p>
-                          <p className="text-sm text-muted-foreground">App Gateway</p>
-                        </div>
-                        <Badge className="bg-status-healthy text-white">Healthy</Badge>
-                      </div>
-                      <div className="flex justify-between items-center p-3 border rounded-md">
-                        <div>
-                          <p className="font-medium">Backend-LB</p>
-                          <p className="text-sm text-muted-foreground">Load Balancer</p>
-                        </div>
-                        <Badge className="bg-status-healthy text-white">Healthy</Badge>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+              <NetworkResourcesGrid resources={loadBalancers} />
             </TabsContent>
             
             <TabsContent value="dns" className="mt-6">

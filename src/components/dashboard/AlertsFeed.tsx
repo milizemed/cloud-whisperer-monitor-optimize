@@ -14,19 +14,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-
-type AlertSeverity = 'critical' | 'warning' | 'info';
-type AlertService = 'compute' | 'storage' | 'database' | 'network' | 'security';
-
-interface Alert {
-  id: string;
-  severity: AlertSeverity;
-  message: string;
-  timestamp: string;
-  service: AlertService;
-  provider: 'aws' | 'azure';
-  isNew?: boolean;
-}
+import { Alert } from '@/lib/types';
 
 interface AlertsFeedProps {
   alerts: Alert[];
@@ -85,14 +73,13 @@ const AlertsFeed = ({ alerts, className }: AlertsFeedProps) => {
                     <span className="ml-1 capitalize">{alert.severity}</span>
                   </Badge>
                   
-                  <Badge 
-                    variant="outline" 
-                    className={cn(
-                      alert.provider === 'aws' 
-                        ? 'text-aws border-aws/20' 
-                        : 'text-azure border-azure/20'
-                    )}
-                  >
+                  <Badge variant="outline" className={cn(
+                    alert.provider === 'aws' 
+                      ? 'text-aws border-aws/20' 
+                      : alert.provider === 'azure'
+                        ? 'text-azure border-azure/20'
+                        : 'text-gcp border-gcp/20'
+                  )}>
                     {alert.provider.toUpperCase()}
                   </Badge>
                 </div>
