@@ -199,7 +199,7 @@ export const metrics = {
   totalInstances: {
     title: 'Total Instances',
     value: '164',
-    change: { value: 12, trend: 'up' },
+    change: { value: 12, trend: 'up' as const },
     data: [
       { name: '00:00', value: 130 },
       { name: '04:00', value: 132 },
@@ -212,7 +212,7 @@ export const metrics = {
   totalStorage: {
     title: 'Storage Usage',
     value: '8.7 TB',
-    change: { value: 5, trend: 'up' },
+    change: { value: 5, trend: 'up' as const },
     data: [
       { name: '00:00', value: 7.6 },
       { name: '04:00', value: 7.8 },
@@ -225,7 +225,7 @@ export const metrics = {
   averageCpu: {
     title: 'Avg. CPU Usage',
     value: '42%',
-    change: { value: 7, trend: 'down' },
+    change: { value: 7, trend: 'down' as const },
     data: [
       { name: '00:00', value: 58 },
       { name: '04:00', value: 54 },
@@ -238,7 +238,7 @@ export const metrics = {
   costEstimate: {
     title: 'Monthly Cost Est.',
     value: '$12,845',
-    change: { value: 3, trend: 'up' },
+    change: { value: 3, trend: 'up' as const },
     data: [
       { name: '00:00', value: 12100 },
       { name: '04:00', value: 12300 },

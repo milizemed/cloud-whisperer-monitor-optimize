@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import Sidebar from '@/components/dashboard/Sidebar';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { RefreshCw, Server, Clock, Cpu, Memory } from 'lucide-react';
+import { RefreshCw, Server, Clock, Cpu, HardDrive } from 'lucide-react';
 import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -80,7 +80,7 @@ const ComputePage = () => {
                         <span className="text-sm">CPU: 35%</span>
                       </div>
                       <div className="flex items-center">
-                        <Memory className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <HardDrive className="h-4 w-4 mr-2 text-muted-foreground" />
                         <span className="text-sm">RAM: 2.4 GB</span>
                       </div>
                     </div>
@@ -102,7 +102,7 @@ const ComputePage = () => {
                         <span className="text-sm">CPU: 22%</span>
                       </div>
                       <div className="flex items-center">
-                        <Memory className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <HardDrive className="h-4 w-4 mr-2 text-muted-foreground" />
                         <span className="text-sm">RAM: 4.8 GB</span>
                       </div>
                     </div>
@@ -124,7 +124,7 @@ const ComputePage = () => {
                         <span className="text-sm">CPU: 18%</span>
                       </div>
                       <div className="flex items-center">
-                        <Memory className="h-4 w-4 mr-2 text-muted-foreground" />
+                        <HardDrive className="h-4 w-4 mr-2 text-muted-foreground" />
                         <span className="text-sm">RAM: 3.2 GB</span>
                       </div>
                     </div>
