@@ -5,6 +5,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
+import ComputePage from "./pages/Compute";
+import StoragePage from "./pages/Storage";
+import NetworkPage from "./pages/Network";
+import SecurityPage from "./pages/Security";
+import AlertsPage from "./pages/Alerts";
+import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -17,12 +23,12 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          <Route path="/compute" element={<Index />} />
-          <Route path="/storage" element={<Index />} />
-          <Route path="/network" element={<Index />} />
-          <Route path="/security" element={<Index />} />
-          <Route path="/alerts" element={<Index />} />
-          <Route path="/settings" element={<Index />} />
+          <Route path="/compute" element={<ComputePage />} />
+          <Route path="/storage" element={<StoragePage />} />
+          <Route path="/network" element={<NetworkPage />} />
+          <Route path="/security" element={<SecurityPage />} />
+          <Route path="/alerts" element={<AlertsPage />} />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
