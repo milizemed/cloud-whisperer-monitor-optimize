@@ -54,7 +54,7 @@ export const generateTimeSeriesData = (
   });
   
   return timePoints.map((time, index) => {
-    const dataPoint: Record<string, any> = { time };
+    const dataPoint: TimeSeriesDataPoint = { time };
     metrics.forEach(metric => {
       dataPoint[metric] = values[metric][index];
     });
@@ -63,6 +63,6 @@ export const generateTimeSeriesData = (
 };
 
 // Resource usage data for line charts
-export const resourceUsageData = generateTimeSeriesData(24, ['awsCpu', 'azureCpu', 'gcpCpu']);
-export const networkUsageData = generateTimeSeriesData(24, ['ingress', 'egress']);
-export const storageUsageData = generateTimeSeriesData(24, ['s3', 'ebs', 'azureBlob', 'gcpStorage'], 'up');
+export const resourceUsageData: TimeSeriesDataPoint[] = generateTimeSeriesData(24, ['awsCpu', 'azureCpu']);
+export const networkUsageData: TimeSeriesDataPoint[] = generateTimeSeriesData(24, ['ingress', 'egress']);
+export const storageUsageData: TimeSeriesDataPoint[] = generateTimeSeriesData(24, ['s3', 'ebs', 'azureBlob'], 'up');

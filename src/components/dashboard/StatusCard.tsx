@@ -4,12 +4,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle, AlertTriangle, AlertCircle } from 'lucide-react';
+import { CloudProvider } from '@/lib/types';
 
 type StatusType = 'healthy' | 'warning' | 'critical';
 
 interface StatusCardProps {
   title: string;
-  provider: 'aws' | 'azure';
+  provider: CloudProvider;
   status: StatusType;
   description?: string;
   lastUpdated?: string;
@@ -42,11 +43,20 @@ const StatusCard = ({
     },
   };
 
-  const providerColor = provider === 'aws' ? 'text-aws' : 'text-azure';
+  const getProviderColor = () => {
+    switch (provider) {
+      case 'aws': return 'text-aws';
+      case 'azure': return 'text-azure';
+      case 'gcp': return 'text-gcp';
+      default: return 'text-primary';
+    }
+  };
+
+  const providerColor = getProviderColor();
 
   return (
     <Card className={cn("overflow-hidden", className)}>
-      <div className={cn("h-1", provider === 'aws' ? 'bg-aws' : 'bg-azure')} />
+      <div className={cn("h-1", providerColor.replace('text-', 'bg-'))} />
       <CardHeader className="p-4 pb-2">
         <div className="flex justify-between items-start">
           <div>
